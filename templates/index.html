@@ -1,22 +1,53 @@
 {% extends "base.html" %}
 
-{% block title %}Caesar Cipher{% endblock %}
+{% block title %}Caesar Cipher and RSA Encryption{% endblock %}
 
 {% block content %}
-<h1>Caesar Cipher</h1>
+<h1>Encryption Tool</h1>
 <form method="post">
     <label for="text">Text:</label>
-    <input type="text" id="text" name="text" required>
+    <input type="text" id="text" name="text" maxlength = "150" required>
 
-    <label for="shift">Shift:</label>
-    <input type="number" id="shift" name="shift" required>
+    <!-- Caesar Cipher Options -->
+    <div id="caesar">
+        <label for="shift">Shift:</label>
+        <input type="number" id="shift" name="shift"  required>
 
-    <label for="case_sensitive">Case Sensitive:</label>
-    <input type="checkbox" id="case_sensitive" name="case_sensitive">
+        <label for="case_sensitive">Case Sensitive:</label>
+        <input type="checkbox" id="case_sensitive" name="case_sensitive">
 
-    <label for="foreign_char">Encrypt Foreign Characters:</label>
-    <input type="checkbox" id="foreign_char" name="foreign_char">
-    
+        <label for="foreign_char">Encrypt Foreign Characters:</label>
+        <input type="checkbox" id="foreign_char" name="foreign_char">
+    </div>
+
+    <!-- RSA Options -->
+    <div id="rsa" style="display: none;">
+        <label for="prime_p">Prime Number p:</label>
+        <input type="number" id="prime_p" name="prime_p" required >
+
+        <label for="prime_q">Prime Number q:</label>
+        <input type="number" id="prime_q" name="prime_q" required >
+
+        <!-- Fields for decryption -->
+        <div id="rsa-decrypt" style="display: none;">
+            <label for="d">Private Key (d):</label>
+            <input type="number" id="d" name="d">
+
+            <label for="n">Modulus (n):</label>
+            <input type="number" id="n" name="n">
+        </div>  
+    </div>
+
+    <div class="radio-group">
+        <label for="algorithm">Algorithm:</label>
+        <label for="caesar">
+            <input type="radio" id="caesar" name="algorithm" value="caesar" checked> Caesar Cipher
+        </label>
+        <label for="rsa">
+            <input type="radio" id="rsa" name="algorithm" value="rsa"> RSA Encryption
+        </label>
+    </div>
+
     <div class="radio-group">
         <label for="action">Action:</label>
         <label for="encrypt">
@@ -30,12 +61,109 @@
     <button type="submit">Submit</button>
 </form>
 
-{% if result %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const caesarOptions = document.getElementById('caesar');
+        const rsaOptions = document.getElementById('rsa');
+        const rsaDecryptOptions = document.getElementById('rsa-decrypt');
+        const copyButton = document.getElementById('copy-button');
+        const resultText = document.getElementById('result-text');
+    
+        // Function to update field requirements based on selected algorithm and action
+        function updateFieldRequirements() {
+            const algorithm = document.querySelector('input[name="algorithm"]:checked').value;
+            const action = document.querySelector('input[name="action"]:checked').value;
+    
+            if (algorithm === 'caesar') {
+                caesarOptions.style.display = 'block';
+                rsaOptions.style.display = 'none';
+                rsaDecryptOptions.style.display = 'none';
+    
+                // Ensure only Caesar Cipher fields are required
+                document.querySelector('#shift').setAttribute('required', 'required');
+                document.querySelectorAll('#rsa input').forEach((field) => {
+                    field.removeAttribute('required');
+                });
+            } else if (algorithm === 'rsa') {
+                caesarOptions.style.display = 'none';
+                rsaOptions.style.display = 'block';
+    
+                // Ensure RSA fields are required based on action
+                if (action === 'decrypt') {
+                    rsaDecryptOptions.style.display = 'block';
+                    document.querySelector('#d').setAttribute('required', 'required');
+                    document.querySelector('#n').setAttribute('required', 'required');
+                } else {
+                    rsaDecryptOptions.style.display = 'none';
+                    document.querySelector('#prime_p').setAttribute('required', 'required');
+                    document.querySelector('#prime_q').setAttribute('required', 'required');
+                }
+    
+                // Ensure shift is not required for RSA
+                document.querySelector('#shift').removeAttribute('required');
+            }
+        }
+    
+        document.querySelectorAll('input[name="algorithm"]').forEach((radio) => {
+            radio.addEventListener('change', updateFieldRequirements);
+        });
+    
+        document.querySelectorAll('input[name="action"]').forEach((radio) => {
+            radio.addEventListener('change', updateFieldRequirements);
+        });
+    
+        // Trigger change event on page load to ensure correct display
+        const checkedAlgorithm = document.querySelector('input[name="algorithm"]:checked');
+        const checkedAction = document.querySelector('input[name="action"]:checked');
+        if (checkedAlgorithm && checkedAction) {
+            checkedAlgorithm.dispatchEvent(new Event('change'));
+            checkedAction.dispatchEvent(new Event('change'));
+        }
+    
+        // Copy to clipboard functionality
+        if (copyButton && resultText) {
+            copyButton.addEventListener('click', function () {
+                // Create a temporary textarea to hold the text
+                const textarea = document.createElement('textarea');
+                textarea.value = resultText.textContent; // Copy the text content
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+    
+                // Optional: Notify the user that the text has been copied
+                alert('Text copied to clipboard!');
+            });
+        }
+    });
+    </script>
+    
+    
+
+{% if error_message %}
+    <div class="result">
+        <h2>Error</h2>
+        <p>{{ error_message }}</p>
+    </div>
+{% elif result %}
     <div class="result">
         <h2>Result</h2>
         <p><strong>Original Text:</strong> {{ text }}</p>
-        <p><strong>Shift:</strong> {{ shift }}</p>
-        <p><strong>{{ action.capitalize() }}ed Text:</strong> {{ result }}</p>
+        <p><strong>Algorithm:</strong> {{ algorithm.capitalize() }}</p>
+        {% if algorithm == "caesar" %}
+            <p><strong>Shift:</strong> {{ shift }}</p>
+        {% elif algorithm == "rsa" %}
+            <p><strong>Prime p:</strong> {{ prime_p }}</p>
+            <p><strong>Prime q:</strong> {{ prime_q }}</p>
+            <p><strong>Decryption Key (d):</strong> {{ d }}</p>
+            <p><strong>Modulus (n):</strong> {{ n }}</p>
+        {% endif %}
+        <p><strong>{{ action.capitalize() }}ed Text:</strong> 
+            <span id="result-text">{{ result }}</span>
+            <button id="copy-button" class="btn btn-outline-primary btn-sm ms-2" aria-label="Copy to clipboard">
+                <i class="bi bi-clipboard"></i> <!-- Use Bootstrap Icons -->
+            </button>
+        </p>
     </div>
 {% endif %}
 {% endblock %}

@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
     <title>{% block title %}Caesar Cipher{% endblock %}</title>
     <style>
         body {
@@ -63,6 +66,31 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
+        }
+        .result-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        .result-text {
+            padding-right: 50px; /* Space for the button */
+            overflow-wrap: break-word; /* Handle long text without horizontal scroll */
+        }
+        .copy-button {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background: #ffffff;
+            color: rgb(0, 0, 0);
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 0 0.375rem 0.375rem 0; /* rounded corners */
+            font-size: 14px;
+        }
+        .copy-button:hover {
+            background: #0056b3;
         }
     </style>
 </head>

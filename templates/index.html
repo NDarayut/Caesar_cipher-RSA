@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Caesar Cipher{% endblock %}
+
+{% block content %}
+<h1>Caesar Cipher</h1>
+<form method="post">
+    <label for="text">Text:</label>
+    <input type="text" id="text" name="text" required>
+
+    <label for="shift">Shift:</label>
+    <input type="number" id="shift" name="shift" required>
+
+    <label for="case_sensitive">Case Sensitive:</label>
+    <input type="checkbox" id="case_sensitive" name="case_sensitive">
+
+    <label for="foreign_char">Encrypt Foreign Characters:</label>
+    <input type="checkbox" id="foreign_char" name="foreign_char">
+    
+    <div class="radio-group">
+        <label for="action">Action:</label>
+        <label for="encrypt">
+            <input type="radio" id="encrypt" name="action" value="encrypt" checked> Encrypt
+        </label>
+        <label for="decrypt">
+            <input type="radio" id="decrypt" name="action" value="decrypt"> Decrypt
+        </label>
+    </div>
+
+    <button type="submit">Submit</button>
+</form>
+
+{% if result %}
+    <div class="result">
+        <h2>Result</h2>
+        <p><strong>Original Text:</strong> {{ text }}</p>
+        <p><strong>Shift:</strong> {{ shift }}</p>
+        <p><strong>{{ action.capitalize() }}ed Text:</strong> {{ result }}</p>
+    </div>
+{% endif %}
+{% endblock %}

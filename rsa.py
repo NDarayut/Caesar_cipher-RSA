@@ -37,39 +37,76 @@ def key_generation(p, q):
     """Calculate public key n & e"""
     n = p * q # Calculate n public key
     phi = (p-1)*(q-1) # phi is used to calculate d and find suitable e
-    e = random.randint(100, 1000000) # generate a random integer
+    e = 7 #random.randint(100, 1000000) # generate a random integer
 
     while(math.gcd(e, phi) != 1): # if e is divisible by phi, we generate it again
-        e = random.randint(100, 1000000)
+        e = random.randint(100, 10000)
 
     """Calculate private key n & d"""
     d= mod_inverse(e, phi)
 
     return ((e, n), (d, n))
 
+def determine_step(n):
+    if 0 < n < 25:
+        raise ValueError("n should be greater than 25.")
+    elif 25 < n < 2525:
+        return 2
+    elif 2525 < n < 252525:
+        return 4
+    elif 252525 < n < 25252525:
+        return 6
+    elif 25252525 < n < 2525252525:
+        return 8
+    else:
+        raise ValueError("n is out of the supported range.")
+    
 def rsa_encryption(public_key, text):
     e, n = public_key
+    steps = determine_step(n)
     cipher_string = []
+    mapped_numbers = ""
+
     for character in text:
         
         if character.isalpha():
             character = character.lower()
             character_number = ord(character) - ord('a')
-            cipher_text = pow(character_number, e) % n
-            
-            cipher_string.append(cipher_text)
+            mapped_numbers += str(character_number).zfill(2)
+
+    for i in range(0, len(mapped_numbers), steps):
+        segment = int(mapped_numbers[i:i + steps])
+        cipher_text = pow(segment, e, n)
+        cipher_string.append(cipher_text)
+
     return cipher_string
 
 def rsa_decryption(private_key, cipher_text):
+    """Decrypt the ciphertext using the RSA algorithm."""
     d, n = private_key
+    steps = determine_step(n)
+    mapped_numbers = ""
+
+    for cipher_value in cipher_text:
+        segment = pow(cipher_value, d, n)
+        mapped_numbers += str(segment).zfill(steps)
+
     decrypt_text = []
-    for character in cipher_text:
-        character_number = (pow(character, d) % n) + ord('a')
-        plain_text = chr(character_number)
-        decrypt_text.append(plain_text)
+    for i in range(0, len(mapped_numbers), 2):  # Each character is represented by 2 digits
+        num = int(mapped_numbers[i:i + 2])
+        if 0 <= num <= 25:
+            decrypt_text.append(chr(num + ord('a')))
+
     return decrypt_text
 
+public_key, private_key = key_generation(191, 23)
+encrypted_text = rsa_encryption(public_key, "love")
+print(f"Public key: {public_key}")
+print(f"Encrypted message: {encrypted_text}")
 
+decrypted_text = rsa_decryption(private_key, encrypted_text)
+print(f"Private key: {private_key}")
+print(f"Decrypted message: {decrypted_text}")
 
 
 

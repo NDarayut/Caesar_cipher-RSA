@@ -37,7 +37,7 @@ def key_generation(p, q):
     """Calculate public key n & e"""
     n = p * q # Calculate n public key
     phi = (p-1)*(q-1) # phi is used to calculate d and find suitable e
-    e = 7 #random.randint(100, 1000000) # generate a random integer
+    e = random.randint(100, 10000) # generate a random integer
 
     while(math.gcd(e, phi) != 1): # if e is divisible by phi, we generate it again
         e = random.randint(100, 10000)
@@ -98,17 +98,3 @@ def rsa_decryption(private_key, cipher_text):
             decrypt_text.append(chr(num + ord('a')))
 
     return decrypt_text
-
-public_key, private_key = key_generation(191, 23)
-encrypted_text = rsa_encryption(public_key, "love")
-print(f"Public key: {public_key}")
-print(f"Encrypted message: {encrypted_text}")
-
-decrypted_text = rsa_decryption(private_key, encrypted_text)
-print(f"Private key: {private_key}")
-print(f"Decrypted message: {decrypted_text}")
-
-
-
-
-    

@@ -6,12 +6,12 @@
 <h1>Encryption Tool</h1>
 <form method="post">
     <label for="text">Text:</label>
-    <input type="text" id="text" name="text" maxlength = "150" required>
+    <input type="text" id="text" name="text" maxlength="150" required>
 
     <!-- Caesar Cipher Options -->
     <div id="caesar">
         <label for="shift">Shift:</label>
-        <input type="number" id="shift" name="shift"  required>
+        <input type="number" id="shift" name="shift" required>
 
         <label for="case_sensitive">Case Sensitive:</label>
         <input type="checkbox" id="case_sensitive" name="case_sensitive">
@@ -22,20 +22,21 @@
 
     <!-- RSA Options -->
     <div id="rsa" style="display: none;">
-        <label for="prime_p">Prime Number p:</label>
-        <input type="number" id="prime_p" name="prime_p" required >
+        <div id="rsa-encrypt" style="display: none;">
+            <label for="prime_p">Prime Number p:</label>
+            <input type="number" id="prime_p" name="prime_p" required>
 
-        <label for="prime_q">Prime Number q:</label>
-        <input type="number" id="prime_q" name="prime_q" required >
+            <label for="prime_q">Prime Number q:</label>
+            <input type="number" id="prime_q" name="prime_q" required>
+        </div>
 
-        <!-- Fields for decryption -->
         <div id="rsa-decrypt" style="display: none;">
             <label for="d">Private Key (d):</label>
-            <input type="number" id="d" name="d">
+            <input type="number" id="d" name="d" required>
 
-            <label for="n">Public key (n):</label>
-            <input type="number" id="n" name="n">
-        </div>  
+            <label for="n">Public Key (n):</label>
+            <input type="number" id="n" name="n" required>
+        </div>
     </div>
 
     <div class="radio-group">
@@ -65,9 +66,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         const caesarOptions = document.getElementById('caesar');
         const rsaOptions = document.getElementById('rsa');
+        const rsaEncryptOptions = document.getElementById('rsa-encrypt');
         const rsaDecryptOptions = document.getElementById('rsa-decrypt');
-        const copyButton = document.getElementById('copy-button');
-        const resultText = document.getElementById('result-text');
 
         // Function to update field requirements based on selected algorithm and action
         function updateFieldRequirements() {
@@ -77,8 +77,7 @@
             if (algorithm === 'caesar') {
                 caesarOptions.style.display = 'block';
                 rsaOptions.style.display = 'none';
-                rsaDecryptOptions.style.display = 'none';
-    
+
                 // Ensure only Caesar Cipher fields are required
                 document.querySelector('#shift').setAttribute('required', 'required');
                 document.querySelectorAll('#rsa input').forEach((field) => {
@@ -87,58 +86,33 @@
             } else if (algorithm === 'rsa') {
                 caesarOptions.style.display = 'none';
                 rsaOptions.style.display = 'block';
-    
+
                 // Ensure RSA fields are required based on action
                 if (action === 'decrypt') {
                     rsaDecryptOptions.style.display = 'block';
-                    document.querySelector('#d').setAttribute('required', 'required');
-                    document.querySelector('#n').setAttribute('required', 'required');
+                    rsaEncryptOptions.style.display = 'none';
                 } else {
                     rsaDecryptOptions.style.display = 'none';
-                    document.querySelector('#prime_p').setAttribute('required', 'required');
-                    document.querySelector('#prime_q').setAttribute('required', 'required');
+                    rsaEncryptOptions.style.display = 'block';
                 }
-    
+
                 // Ensure shift is not required for RSA
                 document.querySelector('#shift').removeAttribute('required');
             }
         }
-    
+
         document.querySelectorAll('input[name="algorithm"]').forEach((radio) => {
             radio.addEventListener('change', updateFieldRequirements);
         });
-    
+
         document.querySelectorAll('input[name="action"]').forEach((radio) => {
             radio.addEventListener('change', updateFieldRequirements);
         });
-    
+
         // Trigger change event on page load to ensure correct display
-        const checkedAlgorithm = document.querySelector('input[name="algorithm"]:checked');
-        const checkedAction = document.querySelector('input[name="action"]:checked');
-        if (checkedAlgorithm && checkedAction) {
-            checkedAlgorithm.dispatchEvent(new Event('change'));
-            checkedAction.dispatchEvent(new Event('change'));
-        }
-    
-        // Copy to clipboard functionality
-        if (copyButton && resultText) {
-            copyButton.addEventListener('click', function () {
-                // Create a temporary textarea to hold the text
-                const textarea = document.createElement('textarea');
-                textarea.value = resultText.textContent; // Copy the text content
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-    
-                // Optional: Notify the user that the text has been copied
-                alert('Text copied to clipboard!');
-            });
-        }
+        updateFieldRequirements();
     });
-    </script>
-    
-    
+</script>
 
 {% if error_message %}
     <div class="result">
@@ -153,10 +127,15 @@
         {% if algorithm == "caesar" %}
             <p><strong>Shift:</strong> {{ shift }}</p>
         {% elif algorithm == "rsa" %}
-            <p><strong>Prime p:</strong> {{ prime_p }}</p>
-            <p><strong>Prime q:</strong> {{ prime_q }}</p>
-            <p><strong>Decryption Key (d):</strong> {{ d }}</p>
-            <p><strong>Modulus (n):</strong> {{ n }}</p>
+            {% if action == "decrypt" %}
+                <p><strong>Private Key (d):</strong> {{ d }}</p>
+                <p><strong>Public Key (n):</strong> {{ n }}</p>
+            {% else %}
+                <p><strong>Prime p:</strong> {{ prime_p }}</p>
+                <p><strong>Prime q:</strong> {{ prime_q }}</p>
+                <p><strong>Private Key (d):</strong> {{ d }}</p>
+                <p><strong>Public Key (n):</strong> {{ n }}</p>
+            {% endif %}
         {% endif %}
         <p><strong>{{ action.capitalize() }}ed Text:</strong> 
             <span id="result-text">{{ result }}</span>

@@ -35,20 +35,24 @@ def home():
                     result = caesar_cipher_decrypt(text, shift, case_sensitive, foreign_char)
             
             elif algorithm == 'rsa':
-                prime_p = int(request.form['prime_p'])
-                prime_q = int(request.form['prime_q'])
-
-                if not is_prime(prime_p) or not is_prime(prime_q):
-                    raise ValueError("Both p and q must be prime numbers.")
-
-                public_key, private_key = key_generation(prime_p, prime_q)
-                d, n = private_key
                 if action == 'encrypt':
-                    cipher_list = rsa_encryption(public_key, text)
-                    result = ' '.join(map(str, cipher_list))
+                    prime_p = int(request.form['prime_p'])
+                    prime_q = int(request.form['prime_q'])
+
+                    if not is_prime(prime_p) or not is_prime(prime_q):
+                        raise ValueError("Both p and q must be prime numbers.")
+
+                    public_key, private_key = key_generation(prime_p, prime_q)
+                    d, n = private_key
+                    if action == 'encrypt':
+                        cipher_list = rsa_encryption(public_key, text)
+                        result = ' '.join(map(str, cipher_list))
+                
                 else:
+                    d = int(request.form['d'])
+                    n = int(request.form['n'])
                     cipher_text = [int(i) for i in text.split()]
-                    decrypted_list = rsa_decryption(private_key, cipher_text)
+                    decrypted_list = rsa_decryption((d, n), cipher_text)
                     result = ''.join(decrypted_list)
         
         except Exception as e:

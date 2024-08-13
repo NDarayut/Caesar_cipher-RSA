@@ -61,23 +61,53 @@ def determine_step(n):
     else:
         raise ValueError("n is out of the supported range.")
     
-def rsa_encryption(public_key, text):
+def rsa_encryption(public_key, text, foreign_char=True, case_sensitive=True):
     e, n = public_key
     steps = determine_step(n)
     cipher_string = []
     mapped_numbers = ""
 
+    if not case_sensitive:
+        text = text.lower()
+
     for character in text:
         
         if character.isalpha():
-            character = character.lower()
-            character_number = ord(character) - ord('a')
-            mapped_numbers += str(character_number).zfill(2)
+            
+            #character = character.lower()
+            if character.islower():
+                character_number = ord(character) - ord('a')
+                mapped_numbers += str(character_number).zfill(2)
+            elif character.isupper():
+                character_number = ord(character) - ord('A') + 69
+                mapped_numbers += str(character_number).zfill(2)
+        else:
+            # Check if user disable special char encryption
+            if(not foreign_char and (character != " ")):
+                mapped_numbers += str(character).zfill(2)
+                print("This is spcial char")
+            # Check if it's a space
+            elif(character == " "):
+                character_number = ord(character)
+                mapped_numbers += str(character_number)
+                print("This is a space")
+            # If user enable special char encryption
+            else:
+                character_number = ord(character)
+                mapped_numbers += str(character_number).zfill(2)
+                print("This is encrypted speical char")
 
     for i in range(0, len(mapped_numbers), steps):
-        segment = int(mapped_numbers[i:i + steps])
-        cipher_text = pow(segment, e, n)
-        cipher_string.append(cipher_text)
+        if(mapped_numbers[i:i + steps].isdigit()):
+            segment = int(mapped_numbers[i:i + steps])
+            cipher_text = pow(segment, e, n)
+            cipher_string.append(cipher_text)
+            
+        else:
+            segment = mapped_numbers[i:i + steps]
+            cipher_string.append(segment)
+            
+            
 
     return cipher_string
 
@@ -88,13 +118,26 @@ def rsa_decryption(private_key, cipher_text):
     mapped_numbers = ""
 
     for cipher_value in cipher_text:
-        segment = pow(cipher_value, d, n)
-        mapped_numbers += str(segment).zfill(steps)
+        if cipher_value.isdigit():
+            segment = pow(int(cipher_value), d, n)
+            mapped_numbers += str(segment).zfill(steps)
+        else:
+            mapped_numbers += str(cipher_value)
 
     decrypt_text = []
     for i in range(0, len(mapped_numbers), 2):  # Each character is represented by 2 digits
-        num = int(mapped_numbers[i:i + 2])
-        if 0 <= num <= 25:
-            decrypt_text.append(chr(num + ord('a')))
+        if(mapped_numbers[i:i + steps].isdigit()):
+            num = int(mapped_numbers[i:i + 2])
+            if 0 <= num < 26:
+                decrypt_text.append(chr(num + ord('a')))
+            elif 69 <= num < 95:
+                decrypt_text.append(chr(num - 69 + ord('A')))
+            else:
+                decrypt_text.append(chr(num))
+        else:
+            segment = mapped_numbers[i:i + steps]
+            segment = segment.replace("0", "")
+            decrypt_text.append(segment)
+            
 
     return decrypt_text

@@ -38,20 +38,24 @@ def home():
                 if action == 'encrypt':
                     prime_p = int(request.form['prime_p'])
                     prime_q = int(request.form['prime_q'])
+                    case_sensitive = 'case_sensitive' in request.form
+                    foreign_char = 'foreign_char' in request.form
 
                     if not is_prime(prime_p) or not is_prime(prime_q):
                         raise ValueError("Both p and q must be prime numbers.")
+                    elif prime_p == prime_q:
+                        raise ValueError("Both p and q must have different prime numbers.")
 
                     public_key, private_key = key_generation(prime_p, prime_q)
                     d, n = private_key
                     if action == 'encrypt':
-                        cipher_list = rsa_encryption(public_key, text)
+                        cipher_list = rsa_encryption(public_key, text, foreign_char, case_sensitive)
                         result = ' '.join(map(str, cipher_list))
                 
                 else:
                     d = int(request.form['d'])
                     n = int(request.form['n'])
-                    cipher_text = [int(i) for i in text.split()]
+                    cipher_text = [i for i in text.split()]
                     decrypted_list = rsa_decryption((d, n), cipher_text)
                     result = ''.join(decrypted_list)
         

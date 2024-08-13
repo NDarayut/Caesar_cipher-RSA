@@ -19,7 +19,6 @@ def caesar_cipher_encrypt(text, shift, case_sensitive=True, foreign_char=True):
                 encrypted_char = chr((ord(character) + shift))
                 encrypt_text = encrypt_text + encrypted_char
             else:
-                
                 encrypt_text = encrypt_text + character
                 
 

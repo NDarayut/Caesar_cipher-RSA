@@ -62,6 +62,7 @@ def determine_step(n):
         raise ValueError("n is out of the supported range.")
     
 def rsa_encryption(public_key, text, foreign_char=True, case_sensitive=True):
+    
     e, n = public_key
     steps = determine_step(n)
     cipher_string = []
@@ -125,7 +126,8 @@ def rsa_decryption(private_key, cipher_text):
             mapped_numbers += str(cipher_value)
 
     decrypt_text = []
-    for i in range(0, len(mapped_numbers), 2):  # Each character is represented by 2 digits
+    for i in range(0, len(mapped_numbers), 2):  # Each character is represented by 2 
+
         if(mapped_numbers[i:i + steps].isdigit()):
             num = int(mapped_numbers[i:i + 2])
             if 0 <= num < 26:
@@ -138,6 +140,5 @@ def rsa_decryption(private_key, cipher_text):
             segment = mapped_numbers[i:i + steps]
             segment = segment.replace("0", "")
             decrypt_text.append(segment)
-            
 
     return decrypt_text

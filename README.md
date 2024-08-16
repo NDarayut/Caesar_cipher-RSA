@@ -11,4 +11,4 @@ Activate the environment: ```.\<your-env-name>\scripts\activate```
 Install the dependencies: ```pip install -r requirements.txt```   
 run flask app: ```python app.py```   
 Copy and paste to your browser: ```http://127.0.0.1:5000```   
-### Enjoy
+# Enjoy!

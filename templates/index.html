@@ -5,13 +5,14 @@
 {% block content %}
 <h1>Encryption Tool</h1>
 <form method="post">
+    
     <label for="text">Text:</label>
     <input type="text" id="text" name="text" maxlength="150" required>
 
     <!-- Caesar Cipher Options -->
     <div id="caesar">
         <label for="shift">Shift:</label>
-        <input type="number" id="shift" name="shift" required>
+        <input type="number" id="shift" name="shift" value=3 required>
 
         <label for="case_sensitive">Case Sensitive:</label>
         <input type="checkbox" id="case_sensitive" name="case_sensitive">
@@ -79,6 +80,7 @@
         function updateFieldRequirements() {
             const algorithm = document.querySelector('input[name="algorithm"]:checked').value;
             const action = document.querySelector('input[name="action"]:checked').value;
+
     
             if (algorithm === 'caesar') {
                 caesarOptions.style.display = 'block';
@@ -89,7 +91,8 @@
                 document.querySelectorAll('#rsa input').forEach((field) => {
                     field.removeAttribute('required');
                 });
-            } else if (algorithm === 'rsa') {
+            } 
+            else if (algorithm === 'rsa') {
                 caesarOptions.style.display = 'none';
                 rsaOptions.style.display = 'block';
 
@@ -97,7 +100,8 @@
                 if (action === 'decrypt') {
                     rsaDecryptOptions.style.display = 'block';
                     rsaEncryptOptions.style.display = 'none';
-                } else {
+                } 
+                else {
                     rsaDecryptOptions.style.display = 'none';
                     rsaEncryptOptions.style.display = 'block';
                 }
@@ -115,8 +119,10 @@
             radio.addEventListener('change', updateFieldRequirements);
         });
 
+
         // Trigger change event on page load to ensure correct display
         updateFieldRequirements();
+        
     });
 </script>
 
@@ -143,12 +149,6 @@
                 <p><strong>Public Key (n):</strong> {{ n }}</p>
             {% endif %}
         {% endif %}
-        <p><strong>{{ action.capitalize() }}ed Text:</strong> 
-            <span id="result-text">{{ result }}</span>
-            <button id="copy-button" class="btn btn-outline-primary btn-sm ms-2" aria-label="Copy to clipboard">
-                <i class="bi bi-clipboard"></i> <!-- Use Bootstrap Icons -->
-            </button>
-        </p>
     </div>
 {% endif %}
 {% endblock %}

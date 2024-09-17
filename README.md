@@ -12,4 +12,5 @@ Install the dependencies: ```pip install -r requirements.txt```
 run flask app: ```python app.py```   
 Copy and paste to your browser: ```http://127.0.0.1:5000```   
 ### To visit the site, click [here.](https://cryptography-yquc.onrender.com/)  
+Note: Site might take 1 minute to load due to inactivity.  
 # Enjoy!

@@ -138,15 +138,18 @@
         <p><strong>Algorithm:</strong> {{ algorithm.capitalize() }}</p>
         {% if algorithm == "caesar" %}
             <p><strong>Shift:</strong> {{ shift }}</p>
+            <p><strong>Result:</strong> {{ result }}</p>
         {% elif algorithm == "rsa" %}
             {% if action == "decrypt" %}
                 <p><strong>Private Key (d):</strong> {{ d }}</p>
                 <p><strong>Public Key (n):</strong> {{ n }}</p>
+                <p><strong>Result:</strong> {{ result }}</p>
             {% else %}
                 <p><strong>Prime p:</strong> {{ prime_p }}</p>
                 <p><strong>Prime q:</strong> {{ prime_q }}</p>
                 <p><strong>Private Key (d):</strong> {{ d }}</p>
                 <p><strong>Public Key (n):</strong> {{ n }}</p>
+                <p><strong>Result:</strong> {{ result }}</p>
             {% endif %}
         {% endif %}
     </div>
